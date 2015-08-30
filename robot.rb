@@ -1,60 +1,52 @@
 class Robot
-  VALID_RANGE = [0..4]
+  VALID_RANGE = (0..4)
   FACINGS = %w(EAST NORTH WEST SOUTH)
-  attr_accessor *%i(x y facing current_instruction)
   PLACE_REGEXP = /PLACE ([0-4]),([0-4]),(EAST|NORTH|WEST|SOUTH)/
+  attr_accessor :output
 
   def execute(instruction)
-    self.current_instruction = instruction
-    place
+    @instruction = instruction
+    self.output = nil
+
+    place && return
     return unless on_board?
-    process_instruction if is_safe?
+
+    report || turn || (move if safe?)
   end
 
-  private
-
-  def process_instruction
-    report || turn || move
-  end
+  protected
 
   def place
-    if current_instruction =~ PLACE_REGEXP
-      self.x, self.y, self.facing = $1.to_i, $2.to_i, $3
+    if @instruction =~ PLACE_REGEXP
+      @x, @y, @facing = $1.to_i, $2.to_i, $3
     end
   end
 
   def report
-    "#{x},#{y},#{facing}" if current_instruction == 'REPORT'
+    self.output = "#{@x},#{@y},#{@facing}" if @instruction == 'REPORT'
   end
 
   def turn
-    self.facing = FACINGS[FACINGS.index(facing) - 4 + 1] if current_instruction == 'LEFT'
-    self.facing = FACINGS[FACINGS.index(facing) - 1] if current_instruction == 'RIGHT'
+    @facing = FACINGS[FACINGS.index(@facing) - 4 + 1] if @instruction == 'LEFT'
+    @facing = FACINGS[FACINGS.index(@facing) - 1] if @instruction == 'RIGHT'
   end
 
   def move
-    if current_instruction == 'MOVE'
-      self.x += 1 if self.facing == FACINGS[1]
-      self.x -= 1 if self.facing == FACINGS[3]
-      self.y += 1 if self.facing == FACINGS[0]
-      self.y -= 1 if self.facing == FACINGS[2]
+    if @instruction == 'MOVE'
+      @y += 1 if @facing == FACINGS[1]
+      @y -= 1 if @facing == FACINGS[3]
+      @x += 1 if @facing == FACINGS[0]
+      @x -= 1 if @facing == FACINGS[2]
     end
   end
 
-  private
-  def is_safe?
-    return true unless current_instruction == 'MOVE'
-    clone = self.clone
-    clone.process_instruction
-    clone.alive?
-  end
-
-  def alive?
-    return true unless on_board?
-    VALID_RANGE.include?(@x) && VALID_RANGE.include?(@y)
+  def safe?
+    imaginary = self.clone
+    imaginary.move
+    imaginary.on_board?
   end
 
   def on_board?
-    @x
+    @x && VALID_RANGE.include?(@x) && VALID_RANGE.include?(@y)
   end
 end
