@@ -14,7 +14,7 @@ When(/^I command to turn left$/) do
   @robot.execute('LEFT')
 end
 
-When(/^I commnad to turn right$/) do
+When(/^I command to turn right$/) do
   @robot.execute('RIGHT')
 end
 
@@ -25,4 +25,24 @@ end
 Then(/^robort reports$/) do
   expect(@robot.execute('REPORT'))
     .to match(/([0-4]),([0-4]),(EAST|NORTH|WEST|SOUTH)/)
+end
+
+When(/^I place robot on bord face to the south$/) do
+  @robot.execute('PLACE 0,0,SOUTH')
+end
+
+Then(/^I should see robot face west$/) do
+  expect(@robot.execute('REPORT')).to include('WEST')
+end
+
+Then(/^I should see robot face north$/) do
+  expect(@robot.execute('REPORT')).to include('NORTH')
+end
+
+Then(/^I should see robot face east$/) do
+  expect(@robot.execute('REPORT')).to include('EAST')
+end
+
+Then(/^I should see robot face south$/) do
+  expect(@robot.execute('REPORT')).to include('SOUTH')
 end

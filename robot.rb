@@ -1,6 +1,6 @@
 class Robot
   VALID_RANGE = [0..4]
-  FACINGS = %i(EAST NORTH WEST SOUTH)
+  FACINGS = %w(EAST NORTH WEST SOUTH)
   attr_accessor *%i(x y facing current_instruction)
   PLACE_REGEXP = /PLACE ([0-4]),([0-4]),(EAST|NORTH|WEST|SOUTH)/
 
@@ -28,14 +28,17 @@ class Robot
   end
 
   def turn
-    # if current_instruction == 'LEFT'
-    #
-    # end
-      # @facing  FACINGS
+    self.facing = FACINGS[FACINGS.index(facing) - 4 + 1] if current_instruction == 'LEFT'
+    self.facing = FACINGS[FACINGS.index(facing) - 1] if current_instruction == 'RIGHT'
   end
 
   def move
-
+    if current_instruction == 'MOVE'
+      self.x += 1 if self.facing == FACINGS[1]
+      self.x -= 1 if self.facing == FACINGS[3]
+      self.y += 1 if self.facing == FACINGS[0]
+      self.y -= 1 if self.facing == FACINGS[2]
+    end
   end
 
   private
