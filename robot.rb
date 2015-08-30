@@ -1,3 +1,4 @@
+# Represent toy robot
 class Robot
   VALID_RANGE = (0..4)
   FACINGS = %w(EAST NORTH WEST SOUTH)
@@ -17,9 +18,10 @@ class Robot
   protected
 
   def place
-    if @instruction =~ PLACE_REGEXP
-      @x, @y, @facing = $1.to_i, $2.to_i, $3
-    end
+    return unless @instruction =~ PLACE_REGEXP
+    @x = Regexp.last_match[1].to_i
+    @y = Regexp.last_match[2].to_i
+    @facing = Regexp.last_match[3]
   end
 
   def report
@@ -32,16 +34,15 @@ class Robot
   end
 
   def move
-    if @instruction == 'MOVE'
-      @y += 1 if @facing == FACINGS[1]
-      @y -= 1 if @facing == FACINGS[3]
-      @x += 1 if @facing == FACINGS[0]
-      @x -= 1 if @facing == FACINGS[2]
-    end
+    return unless @instruction == 'MOVE'
+    @y += 1 if @facing == FACINGS[1]
+    @y -= 1 if @facing == FACINGS[3]
+    @x += 1 if @facing == FACINGS[0]
+    @x -= 1 if @facing == FACINGS[2]
   end
 
   def safe?
-    imaginary = self.clone
+    imaginary = clone
     imaginary.move
     imaginary.on_board?
   end
