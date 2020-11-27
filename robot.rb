@@ -47,12 +47,9 @@ class Robot
   end
 
   def safe_to_move?
+    imaginary = clone
     imaginary.move
     imaginary.on_board?
-  end
-
-  def imaginary
-    @imaginary ||= clone
   end
 
   protected

@@ -29,3 +29,20 @@ Feature: control examples
     And order to move
     And order to move
     Then I should see "3,4,NORTH"
+
+
+  Scenario: 5
+    Given Robot exists
+    When Place robot to 3,2 facing "NORTH"
+    And order to move
+    And order to move
+    And order to move
+    And I command to turn left
+    And I command to turn left
+    And order to move
+    And order to move
+    And order to move
+    And order to move
+    And order to move
+    And order to move
+    Then I should see "3,0,SOUTH"
