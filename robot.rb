@@ -10,26 +10,28 @@ class Robot
   def execute(instruction)
     @instruction = instruction
 
-    return if place
-
-    if on_board?
-      report || turn_left || turn_right || (move if safe_to_move?)
-    end
+    place_on_board || on_board_actions
   end
 
-  protected
+  private
 
-  def report
-    "#{x},#{y},#{facing}" if instruction == 'REPORT'
-  end
-
-  def place
+  def place_on_board
     return unless instruction =~ PLACE_REGEXP
 
     last_match = Regexp.last_match
     @x = last_match[1].to_i
     @y = last_match[2].to_i
     @facing = last_match[3]
+  end
+
+  def on_board_actions
+    return unless on_board?
+
+    report || turn_left || turn_right || (move if safe_to_move?)
+  end
+
+  def report
+    "#{x},#{y},#{facing}" if instruction == 'REPORT'
   end
 
   def turn_left
@@ -44,24 +46,27 @@ class Robot
     @facing = FACINGS[FACINGS.index(facing) - 1]
   end
 
+  def safe_to_move?
+    imaginary.move
+    imaginary.on_board?
+  end
+
+  def imaginary
+    @imaginary ||= clone
+  end
+
+  protected
+
+  def on_board?
+    VALID_RANGE.include?(x) && VALID_RANGE.include?(y)
+  end
+
   def move
-    return unless instruction == "MOVE"
+    return unless instruction == 'MOVE'
 
     @y += 1 if facing == FACINGS[1]
     @y -= 1 if facing == FACINGS[3]
     @x += 1 if facing == FACINGS[0]
     @x -= 1 if facing == FACINGS[2]
-  end
-
-  def safe_to_move?
-    return unless instruction == "MOVE"
-
-    imaginary = clone
-    imaginary.move
-    imaginary.on_board?
-  end
-
-  def on_board?
-    VALID_RANGE.include?(x) && VALID_RANGE.include?(y)
   end
 end
